@@ -1,0 +1,46 @@
+﻿@model OrderViewModel
+
+<div class="row">
+    <div class="col-3">
+        @await Html.PartialAsync("AdminToolbar")
+    </div>
+    <div class="col-9">
+        <div class="border border-light rounded">
+            <h3>Order</h3>
+            <form method="post">
+                <table class="table">
+                    <tr>
+                        <td>Date</td>
+                        <td>@Model.Date</td>
+                    </tr>
+                    <tr>
+                        <td>Time</td>
+                        <td>@Model.Time</td>
+                    </tr>
+                    <tr>
+                        <td>Email</td>
+                        <td>@Model.Email</td>
+                    </tr>
+                    <tr>
+                        <td>FullName</td>
+                        <td>@Model.FullName</td>
+                    </tr>
+                    <tr>
+                        <td>Price</td>
+                        <td>@Model.Cost€</td>
+                    </tr>
+                    <tr>
+                        <td>Status</td>
+                        <td>
+                            <select asp-for="@Model.OrderStatus"
+                                    asp-items="@Html.GetEnumSelectList<OrderStatusViewModel>()"
+                                    class="form-control" name="newStatus">
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+                <button class="btn btn-success" type="submit" asp-area="Admin" asp-controller="Orders" asp-action="SaveStatus" asp-route-newStatus="@Model.OrderStatus" asp-route-orderId="@Model.OrderId">Save</button>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,36 @@
+﻿@model UserRegistration
+
+<div class="container text-center">
+    <div class="row justify-content-start">
+        <div class="col-3">
+            @await Html.PartialAsync("AdminToolbar")
+        </div>
+        <div class="col-9">
+            <div class="border border-dark rounded">
+                <h3>New user</h3>
+                <hr />
+                <div style="max-width:300px; margin:0 auto;">
+                    <form method="post">
+                        <div class="validation" asp-validation-summary="ModelOnly"></div>
+                        <div class="form-group">
+                            <label asp-for="Email" for="exampleInputEmail1">Email address</label>
+                            <input asp-for="Email" type="email" name="Email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+                            <span asp-validation-for="Email"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Password" for="exampleInputPassword1">Password</label>
+                            <input asp-for="Password" type="password" name="Password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+                            <span asp-validation-for="Password"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="PasswordConfirm" for="exampleInputPassword2">Confirm Password </label>
+                            <input asp-for="PasswordConfirm" type="password" name="PasswordConfirm" class="form-control" id="exampleInputPassword1" placeholder="Password confirm">
+                            <span asp-validation-for="PasswordConfirm"></span>
+                        </div>
+                        <button type="submit" asp-area="Admin" asp-controller="Users" asp-action="AddUser" asp-route-user="@Model" class="btn btn-primary" style="margin-bottom:20px">Create</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

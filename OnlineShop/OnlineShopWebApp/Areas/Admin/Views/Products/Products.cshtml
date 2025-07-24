@@ -1,0 +1,45 @@
+﻿@model List<ProductViewModel>
+@{
+    int positionNumber = 0;
+}
+
+<div class="container text-center">
+    <div class="row justify-content-start">
+        <div class="col-3">
+            @await Html.PartialAsync("AdminToolbar")
+        </div>
+        <div class="col-9">
+            <div class="border border-dark rounded">
+                <h3>Products</h3>
+                <hr />
+                <form method="post">
+                    <table class="table table-dark table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">№</th>
+                                <th scope="col">Tour name</th>
+                                <th scope="col">Cost</th>
+                                <th scope="col">Description</th>
+                                <th scope="auto"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var product in Model)
+                            {
+                                { positionNumber++; }
+
+                                <tr>
+                                    <th scope="row">@positionNumber</th>
+                                    <td>@product.Name</td>
+                                    <td>@product.Cost€</td>
+                                    <td>@product.ShortDescription</td>
+                                    <td><button type="submit" class="btn btn-primary" asp-area="Admin" asp-action="EditProduct" asp-controller="Products" asp-route-id="@product.Id">Edit</button></td>
+                                </tr>
+                            }
+                    </table>
+                    <button type="submit" asp-area="Admin" asp-controller="Products" asp-action="AddProduct" class="btn btn-primary">Add new product</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

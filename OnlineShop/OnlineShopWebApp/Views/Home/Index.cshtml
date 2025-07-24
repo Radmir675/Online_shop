@@ -1,0 +1,75 @@
+﻿@model HomePageViewModel
+@{
+    ViewData["Title"] = "Products Page";
+}
+<form class="form-inline" method="post">
+    <div class="validation" asp-validation-summary="ModelOnly"></div>
+    <div>
+        <p style="padding-right: 10px; margin:0 auto; padding-bottom:8px; vertical-align:middle;">Price</p>
+    </div>
+    <label class="sr-only" asp-for="SearchViewModel.DownCost">Name</label>
+    <input type="number" asp-for="SearchViewModel.DownCost" name="DownCost" style="width:90px" class="form-control mb-2 mr-sm-2" placeholder="from"
+           value="@Model?.SearchViewModel?.DownCost">
+    <span asp-validation-for="SearchViewModel.DownCost"></span>
+
+    <label class="sr-only" asp-for="SearchViewModel.UpCost">Name</label>
+    <input type="number" asp-for="SearchViewModel.UpCost" name="UpCost" style="width:90px" class="form-control mb-2 mr-sm-2" placeholder="to"
+           value="@Model?.SearchViewModel?.UpCost">
+    <span asp-validation-for="SearchViewModel.UpCost"></span>
+    <div>
+        <p style="padding-right: 10px; margin:0 auto; padding-bottom:8px; vertical-align:middle;">Search</p>
+    </div>
+    <label class="sr-only" asp-for="SearchViewModel.KeyWord">Name</label>
+    <input type="text" asp-for="SearchViewModel.KeyWord" name="KeyWord" style="width:150px" class="form-control mb-2 mr-sm-2" id="inlineFormInputName2" placeholder="e.g. Murmansk"
+           value="@Model?.SearchViewModel?.KeyWord">
+    <span asp-validation-for="SearchViewModel.KeyWord"></span>
+    <div style="padding-right: 10px; padding-bottom:8px; vertical-align:middle;">
+        <tr>
+            <td>Sorting</td>
+            <td>
+                <select asp-for="@Model.SearchViewModel.SortProductStatus"
+                        asp-items="@Html.GetEnumSelectList<SortProductsStatus>()"
+                        class="form-control" name="SortProductStatus">
+                </select>
+            </td>
+        </tr>
+    </div>
+
+    <button type="submit" asp-controller="Home" asp-action="Index" asp-route-SortProductStatus="@Model.SearchViewModel.SortProductStatus" style="margin-right: 10px" class="btn btn-primary mb-2">Apply</button>
+    @{
+        var searchViewModelEmpty = new SearchViewModel();
+    }
+    <button type="submit" class="btn btn-primary mb-2" asp-controller="Home" asp-action="Index" asp-route-searchViewModel="@searchViewModelEmpty">Reset</button>
+
+    <div class="row">
+        @foreach (var product in Model.ProductViewModel)
+        {
+            <div class="col-3 card shadow">
+                <img class="card-img-top h-100" src=@product?.Images?.FirstOrDefault()?.Link />
+                <div class="card-body">
+                    <a style="color:black" href="product/index/@product.Id">
+                        <h5>@product.Name</h5>
+                    </a>
+                    <h5>@product.Cost€</h5>
+                    <a class="btn btn-dark" href="/purchases/index?productId=@product.Id" role="button">Add to cart</a>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Pagination -->
+    <div style="height:100px">
+        <div style="margin-top:20px">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination">
+                    @for (int i = 1; i <= Model.PageViewModel.TotalPages; i++)
+                    {
+                        <li class="page-item">
+                            <button type="submit" class="btn btn-secondary btn-lg page-link" asp-controller="Home" asp-action="Index" asp-route-page="@i">@i</button>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        </div>
+    </div>
+</form>

@@ -1,0 +1,40 @@
+﻿@model OrderViewModel
+@{
+    ViewData["Title"] = "Order";
+}
+<form method="post">
+    <div style="max-width:500px; margin:0 auto;">
+        <div class="validation" asp-validation-summary="ModelOnly"></div>
+        <div class="form-group">
+            <input asp-for="UserId" type="hidden" name="UserId" class="form-control"/>
+        </div>
+        <div class="form-group">
+            <label asp-for="Email" for="exampleInputEmail1">Email address</label>
+            <input asp-for="Email" type="email" name="Email" class="form-control" />
+            <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+            <span asp-validation-for="Email"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="FullName" for="exampleInputFullName">Full Name</label>
+            <input asp-for="FullName" type="text" class="form-control" name="FullName" placeholder="Enter full name" />
+            <span asp-validation-for="FullName"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Number" for="exampleInputFullNumber">Number</label>
+            <input asp-for="Number" type="text" name="Number" class="form-control" placeholder="Enter phone number" />
+            <span asp-validation-for="Number"></span>
+        </div>
+        <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="exampleCheck1" />
+            <label class="form-check-label" for="exampleCheck1">Remember me</label>
+        </div>
+
+        <button type="submit" asp-controller="Order" asp-action="Buy" asp-route-currentOrder="@Model.Email" class="btn btn-outline-success">Submit</button>
+        <button formnovalidate type="submit" asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Сontinue shopping</button>
+    </div>
+</form>
+
+
+
+
+

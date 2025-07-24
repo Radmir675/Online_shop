@@ -1,0 +1,49 @@
+﻿@model List<CartItemViewModel>
+@{
+    ViewData["Title"] = "Basket Page";
+}
+@{
+    int positionNumber = 0;
+
+    var totalCost = ViewBag.totalCost;
+    decimal total = 0;
+
+}
+
+<table class="table table-dark table-hover">
+    <thead>
+        <tr>
+            <th scope="col">№</th>
+            <th scope="col">Tour name</th>
+            <th scope="col">Quantity</th>
+            <th scope="col">Price</th>
+            <th scope="col">Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in Model)
+        {
+            { positionNumber++; }
+            { total = product.Product.Cost * product.Quantity; }
+            <tr>
+                <th scope="row">@positionNumber</th>
+                <td>@product.Product.Name</td>
+                <td>@product.Quantity</td>
+                <td>@product.Product.Cost€</td>
+                <td>@total€</td>
+                <td><a href="/Purchases/IncrementCount?productId=@product.Product.Id" class="btn btn-light">+</a></td>
+                <td><a href="/Purchases/DecrementCount?productId=@product.Product.Id" class="btn btn-light">-</a></td>
+            </tr>
+        }
+</table>
+<h5>Итоговая сумма @totalCost€</h5>
+
+<div style="display:flex">
+    <form>
+        <button type="submit" asp-controller="Order" asp-action="Index"  class="btn btn-warning">Checkout</button>
+    </form>
+
+    <form>
+        <button type="submit" asp-controller="Purchases" asp-action="ClearCart" class="btn btn-danger">Clear cart</button>
+    </form>
+</div>

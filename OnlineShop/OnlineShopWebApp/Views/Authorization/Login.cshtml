@@ -1,0 +1,26 @@
+﻿@model UserLogin
+
+<form method="post">
+    <div style="max-width:300px; margin:0 auto;">
+        <div class="validation" asp-validation-summary="ModelOnly"></div>
+        <h3>Login</h3>
+        <input type="hidden" name="returnUrl" value="@Model.ReturnUrl">
+        <div class="form-group">
+            <label asp-for="Email" for="exampleInputEmail1">Email address</label>
+            <input type="email" asp-for="Email" name="Email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+            <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+            <span asp-validation-for="Email"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Password" for="exampleInputPassword1">Password</label>
+            <input asp-for="Password" type="password" name="Password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+            <span asp-validation-for="Password"></span>
+        </div>
+        <div class="form-check">
+            <input type="checkbox" value="true" name="IsRemember" class="form-check-input" id="exampleCheck1">
+            <label class="form-check-label" for="exampleCheck1">Remember me</label>
+        </div>
+        <button type="submit" asp-controller="Authorization" asp-action="Login" class="btn btn-primary">Log in</button>
+        <button formnovalidate type="submit" asp-controller="Authorization" asp-action="ShowRegistrationForm" class="btn btn-link">Create new account</button>
+    </div>
+</form>

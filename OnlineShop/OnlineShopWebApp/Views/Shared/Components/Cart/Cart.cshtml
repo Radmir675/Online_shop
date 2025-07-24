@@ -1,0 +1,10 @@
+﻿@model int
+@{ int? productsCount = Model > 0 ? Model : null;}
+
+
+<div class="header_backet_main">
+    <a class="header_backet" asp-area="" asp-controller="Purchases" asp-action="ShowItems"></a>
+
+</div>
+@productsCount
+
