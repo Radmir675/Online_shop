@@ -39,7 +39,7 @@ namespace OnlineShopWebApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Buy(OrderViewModel currentOrder)
+        public async Task<IActionResult> BuyAsync(OrderViewModel currentOrder)
         {
 
             if (currentOrder.Email == currentOrder.Number)

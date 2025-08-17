@@ -38,7 +38,7 @@ namespace OnlineShopWebApp.Controllers
             }
             return View();
         }
-        public async Task<IActionResult> ShowItems()
+        public async Task<IActionResult> ShowItemsAsync()
         {
             var currentCartItems = await cartsDbRepository?.TryGetAllItemsAsync(UserId);
             var itemsInCart = currentCartItems?.Select(x => mapper.Map<CartItemViewModel>(x)).ToList();
@@ -47,7 +47,7 @@ namespace OnlineShopWebApp.Controllers
             return cart == null ? View("EmptyBag") : View("Index", itemsInCart);
         }
 
-        public async Task<IActionResult> IncrementCount(Guid productId)
+        public async Task<IActionResult> IncrementCountAsync(Guid productId)
         {
             if ((await cartsDbRepository.TryGetAllItemsAsync(UserId)).Any(x => x.Product.Id == productId))
             {
@@ -57,7 +57,7 @@ namespace OnlineShopWebApp.Controllers
 
         }
 
-        public async Task<IActionResult> DecrementCount(Guid productId)
+        public async Task<IActionResult> DecrementCountAsync(Guid productId)
         {
             if ((await cartsDbRepository.TryGetAllItemsAsync(UserId)).Any(x => x.Product.Id == productId))
             {
@@ -66,7 +66,7 @@ namespace OnlineShopWebApp.Controllers
             return RedirectToAction("ShowItems");
         }
 
-        public async Task<IActionResult> ClearCart()
+        public async Task<IActionResult> ClearCartAsync()
         {
             await cartsDbRepository.DeleteCartAsync(UserId);
             return RedirectToAction("ShowItems");
