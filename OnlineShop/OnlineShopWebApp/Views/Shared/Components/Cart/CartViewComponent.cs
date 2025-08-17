@@ -1,10 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using OnlineShop.db;
+using OnlineShop.db.Interfaces;
 using OnlineShop.db.Models;
 using OnlineShopWebApp.Models;
+using System.Threading.Tasks;
 
-namespace OnlineShopWebApp.Views.Shared.ViewComponents.CartViewComponents
+namespace OnlineShopWebApp.Views.Shared.Components.Cart
 {
     public class CartViewComponent : ViewComponent
     {
@@ -16,9 +17,9 @@ namespace OnlineShopWebApp.Views.Shared.ViewComponents.CartViewComponents
             this.cartsRepository = cartsRepository;
             this.mapper = mapper;
         }
-        public IViewComponentResult Invoke()
+        public async Task<IViewComponentResult> InvokeAsync()
         {
-            var cart = cartsRepository.TryGetByUserId(ConstantFields.UserId);
+            var cart = await cartsRepository.TryGetByUserIdAsync(ConstantFields.UserId);
             var cartViewModel = mapper.Map<CartViewModel>(cart);
             var productCount = cartViewModel?.Quantity ?? 0;
             return View("Cart", productCount);

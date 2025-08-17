@@ -7,8 +7,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OnlineShop.db;
+using OnlineShop.db.Interfaces;
 using OnlineShop.db.Models;
-using OnlineShopWebApp.db;
+using OnlineShop.db.Repositories;
 using OnlineShopWebApp.Helpers;
 using Serilog;
 using System;
@@ -46,7 +47,7 @@ namespace OnlineShopWebApp
 
             services.AddMemoryCache();
             services.AddHostedService<ProductCache>();
-            
+
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
 
             services.AddTransient<IProductsRepository, ProductsDbRepository>();

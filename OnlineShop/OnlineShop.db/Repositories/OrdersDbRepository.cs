@@ -1,9 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using OnlineShop.db.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
-namespace OnlineShop.db
+namespace OnlineShop.db.Repositories
 {
     public class OrdersDbRepository : IOrdersRepository
     {
@@ -14,24 +16,26 @@ namespace OnlineShop.db
             this.dataBaseContext = dataBaseContext;
         }
 
-        public void Add(Order newOrder)
+        public async Task AddAsync(Order newOrder)
         {
-            dataBaseContext.Orders.Add(newOrder);
+            await dataBaseContext.Orders.AddAsync(newOrder);
         }
-        public List<Order> GetAll(Guid userId)
+        public async Task<List<Order>> GetAllAsync(Guid userId)
         {
-            return dataBaseContext.Orders.Include(x => x.CartItems).ThenInclude(x => x.Product).ToList();
+            return await dataBaseContext.Orders
+                .Include(x => x.CartItems)
+                .ThenInclude(x => x.Product).ToListAsync();
         }
-        public Order TryGetById(Guid orderId)
+        public async Task<Order> TryGetByIdAsync(Guid orderId)
         {
-            var order = dataBaseContext.Orders.FirstOrDefault(x => x.OrderId == orderId);
+            var order = await dataBaseContext.Orders.FirstOrDefaultAsync(x => x.OrderId == orderId);
             return order;
         }
-        public void ChangeStatus(Order order)
+        public async Task ChangeStatusAsync(Order order)
         {
             var currentOrder = dataBaseContext.Orders.SingleOrDefault(x => x.OrderId == order.OrderId);
             currentOrder.OrderStatus = order.OrderStatus;
-            dataBaseContext.SaveChanges();
+            await dataBaseContext.SaveChangesAsync();
         }
 
     }

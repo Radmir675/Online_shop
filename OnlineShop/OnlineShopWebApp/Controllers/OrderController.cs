@@ -2,9 +2,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OnlineShop.db;
+using OnlineShop.db.Interfaces;
 using OnlineShopWebApp.Models;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace OnlineShopWebApp.Controllers
 {
@@ -24,10 +26,10 @@ namespace OnlineShopWebApp.Controllers
             ordersRepository = OrdersDbRepository;
             this.mapper = mapper;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
 
-            if (cartsDbRepository.TryGetAllItems(UserId).Count == 0)
+            if ((await cartsDbRepository.TryGetAllItemsAsync(UserId)).Count == 0)
             {
                 return RedirectToAction("ShowItems", "Purchases");
             }
@@ -37,7 +39,7 @@ namespace OnlineShopWebApp.Controllers
         }
 
         [HttpPost]
-        public IActionResult Buy(OrderViewModel currentOrder)
+        public async Task<IActionResult> Buy(OrderViewModel currentOrder)
         {
 
             if (currentOrder.Email == currentOrder.Number)
@@ -50,9 +52,10 @@ namespace OnlineShopWebApp.Controllers
                 return View("Index", currentOrder);
             }
             var orderToSave = mapper.Map<Order>(currentOrder);
-            orderToSave.CartItems = cartsDbRepository.TryGetByUserId(UserId).CartItems.ToList();
-            ordersRepository.Add(orderToSave);
-            cartsDbRepository.DeleteCart(UserId);
+            var user = await cartsDbRepository.TryGetByUserIdAsync(UserId);
+            orderToSave.CartItems = user.CartItems.ToList();
+            await ordersRepository.AddAsync(orderToSave);
+            await cartsDbRepository.DeleteCartAsync(UserId);
             return View("Buy");
         }
     }

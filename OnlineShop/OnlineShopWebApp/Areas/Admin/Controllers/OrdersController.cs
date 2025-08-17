@@ -2,9 +2,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OnlineShop.db;
+using OnlineShop.db.Interfaces;
 using OnlineShopWebApp.Models;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace OnlineShopWebApp.Areas.Admin.Controllers
 {
@@ -20,16 +22,16 @@ namespace OnlineShopWebApp.Areas.Admin.Controllers
             this.ordersDbRepository = ordersDbRepository;
             this.mapper = mapper;
         }
-        public IActionResult ShowOrders()
+        public async Task<IActionResult> ShowOrders()
         {
-            var orders = ordersDbRepository.GetAll(UserId);
+            var orders = await ordersDbRepository.GetAllAsync(UserId);
             var ordersToView = orders.Select(order => mapper.Map<OrderViewModel>(order)).ToList();
             return View("Orders", ordersToView);
         }
         [HttpPost]
-        public IActionResult ShowOrderInfo(Guid orderId)
+        public async Task<IActionResult> ShowOrderInfo(Guid orderId)
         {
-            var order = ordersDbRepository?.TryGetById(orderId);
+            var order = await ordersDbRepository?.TryGetByIdAsync(orderId);
             if (order == null)
             {
                 return RedirectToAction("ShowOrders");
@@ -39,14 +41,14 @@ namespace OnlineShopWebApp.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public IActionResult SaveStatus(Guid orderId, OrderStatusViewModel newStatus)
+        public async Task<IActionResult> SaveStatus(Guid orderId, OrderStatusViewModel newStatus)
         {
-            var order = ordersDbRepository?.TryGetById(orderId);
+            var order = await ordersDbRepository?.TryGetByIdAsync(orderId);
             if (order != null)
             {
                 var status = mapper.Map<OrderStatus>(newStatus);
                 order.OrderStatus = status;
-                ordersDbRepository.ChangeStatus(order);
+                ordersDbRepository.ChangeStatusAsync(order);
             }
             return RedirectToAction("ShowOrders");
         }

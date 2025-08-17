@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OnlineShop.db;
-using OnlineShop.db.Models;
+using OnlineShop.db.Interfaces;
 using OnlineShopWebApp.Models;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace OnlineShopWebApp.Controllers
 {
@@ -16,66 +16,59 @@ namespace OnlineShopWebApp.Controllers
         private readonly IProductsRepository productsDbRepository;
         private readonly IMapper mapper;
         private Guid UserId = ConstantFields.UserId;
-        Cart cart;
         public PurchasesController(ICartsRepository cartsDbRepository, IProductsRepository productsRepository, IMapper mapper)
         {
             this.cartsDbRepository = cartsDbRepository;
             this.productsDbRepository = productsRepository;
             this.mapper = mapper;
-            cart = cartsDbRepository.TryGetByUserId(UserId);
         }
 
-        public IActionResult Index(Guid? productId)
+        public async Task<IActionResult> Index(Guid? productId)
         {
             if (productId.HasValue)
             {
-                cart = cartsDbRepository.TryGetByUserId(UserId);
+                var cart = await cartsDbRepository.TryGetByUserIdAsync(UserId);
                 if (cart == null)
                 {
-                    cart = cartsDbRepository.CreateNewRepository(UserId);
+                    await cartsDbRepository.CreateNewRepositoryAsync(UserId);
                 }
-                cartsDbRepository.AddItem(productId.Value, UserId);
+                await cartsDbRepository.AddItemAsync(productId.Value, UserId);
 
                 return RedirectToAction("ShowItems");
             }
-            else
-            {
-                return View();
-            }
-
+            return View();
         }
-        public IActionResult ShowItems()
+        public async Task<IActionResult> ShowItems()
         {
-            var currentCartItems = cartsDbRepository?.TryGetAllItems(UserId);
+            var currentCartItems = await cartsDbRepository?.TryGetAllItemsAsync(UserId);
             var itemsInCart = currentCartItems?.Select(x => mapper.Map<CartItemViewModel>(x)).ToList();
-            ViewBag.totalCost = cartsDbRepository.GetTotalPrice(UserId).ToString("0.##");
+            ViewBag.totalCost = (await cartsDbRepository.GetTotalPriceAsync(UserId)).ToString("0.##");
+            var cart = await cartsDbRepository.TryGetByUserIdAsync(UserId);
             return cart == null ? View("EmptyBag") : View("Index", itemsInCart);
         }
 
-        public IActionResult IncrementCount(Guid productId)
+        public async Task<IActionResult> IncrementCount(Guid productId)
         {
-            if (cartsDbRepository.TryGetAllItems(UserId).Any(x => x.Product.Id == productId))
+            if ((await cartsDbRepository.TryGetAllItemsAsync(UserId)).Any(x => x.Product.Id == productId))
             {
-                cartsDbRepository.AddItem(productId, UserId);
-
+                await cartsDbRepository.AddItemAsync(productId, UserId);
             }
             return RedirectToAction("ShowItems");
 
         }
 
-        public IActionResult DecrementCount(Guid productId)
+        public async Task<IActionResult> DecrementCount(Guid productId)
         {
-            if (cartsDbRepository.TryGetAllItems(UserId).Any(x => x.Product.Id == productId))
+            if ((await cartsDbRepository.TryGetAllItemsAsync(UserId)).Any(x => x.Product.Id == productId))
             {
-                cartsDbRepository.ReduceItemCount(productId, UserId);
+                await cartsDbRepository.ReduceItemCountAsync(productId, UserId);
             }
             return RedirectToAction("ShowItems");
         }
 
-        public IActionResult ClearCart()
+        public async Task<IActionResult> ClearCart()
         {
-            cartsDbRepository.DeleteCart(UserId);
-
+            await cartsDbRepository.DeleteCartAsync(UserId);
             return RedirectToAction("ShowItems");
         }
     }

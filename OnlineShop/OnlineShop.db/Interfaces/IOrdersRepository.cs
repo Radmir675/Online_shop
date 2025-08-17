@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace OnlineShop.db
+namespace OnlineShop.db.Interfaces
 {
     public interface IOrdersRepository
     {
-        void Add(Order newOrder);
-        List<Order> GetAll(Guid userId);
-        Order TryGetById(Guid orderId);
-        void ChangeStatus(Order order);
+        Task AddAsync(Order newOrder);
+        Task<List<Order>> GetAllAsync(Guid userId);
+        Task<Order> TryGetByIdAsync(Guid orderId);
+        Task ChangeStatusAsync(Order order);
     }
 }

@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using OnlineShop.db;
+using OnlineShop.db.Interfaces;
 using OnlineShopWebApp.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace OnlineShopWebApp.Areas.Admin.Controllers
 {
@@ -25,9 +27,9 @@ namespace OnlineShopWebApp.Areas.Admin.Controllers
             this.mapper = mapper;
             this.appEnviroment = appEnviroment;
         }
-        public IActionResult ShowProducts()
+        public async Task<IActionResult> ShowProducts()
         {
-            var products = productsDbRepository.GetAll();
+            var products = await productsDbRepository.GetAllAsync();
             var productsToView = products.Select(product => mapper.Map<ProductViewModel>(product)).ToList() ?? new List<ProductViewModel>();
             return View("Products", productsToView);
         }
@@ -37,11 +39,11 @@ namespace OnlineShopWebApp.Areas.Admin.Controllers
             return View("ProductInfo");
         }
         [HttpPost]
-        public IActionResult Save(ProductViewModel product, Guid? id)
+        public async Task<IActionResult> Save(ProductViewModel product, Guid? id)
         {
             if (!ModelState.IsValid && id != null)
             {
-                var productFromRepository = productsDbRepository.TryGetProductById(id.Value);
+                var productFromRepository = await productsDbRepository.TryGetProductByIdAsync(id.Value);
                 return View("ProductInfo", productFromRepository);
             }
 
@@ -71,19 +73,19 @@ namespace OnlineShopWebApp.Areas.Admin.Controllers
             }
             if (id == null)
             {
-                productsDbRepository.Add(new Product(product.Name, product.Cost, product.ShortDescription, product.Images));
+                productsDbRepository.AddAsync(new Product(product.Name, product.Cost, product.ShortDescription, product.Images));
             }
             else
             {
-                productsDbRepository.Edit(new Product(product.Name, product.Cost, product.ShortDescription, product.Images), id.Value);
+                productsDbRepository.EditAsync(new Product(product.Name, product.Cost, product.ShortDescription, product.Images), id.Value);
             }
             return RedirectToAction("ShowProducts", "Products");
         }
 
         [HttpPost]
-        public IActionResult EditProduct(Guid id)
+        public async Task<IActionResult> EditProduct(Guid id)
         {
-            var product = productsDbRepository.TryGetProductById(id);
+            var product = await productsDbRepository.TryGetProductByIdAsync(id);
             var productToView = mapper.Map<ProductViewModel>(product);
             if (product == null)
             {
@@ -96,7 +98,7 @@ namespace OnlineShopWebApp.Areas.Admin.Controllers
         {
             if (id != Guid.Empty)
             {
-                productsDbRepository.Delete(id);
+                productsDbRepository.DeleteAsync(id);
             }
             return RedirectToAction("ShowProducts", "Products");
         }

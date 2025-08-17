@@ -1,15 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using OnlineShop.db.Interfaces;
 using OnlineShop.db.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
-namespace OnlineShop.db
+namespace OnlineShop.db.Repositories
 {
     public class CartsDbRepository : ICartsRepository
     {
-
-
         private readonly DataBaseContext dataBaseContext;
         private readonly IProductsRepository productsDbRepository;
 
@@ -19,27 +19,27 @@ namespace OnlineShop.db
             this.dataBaseContext = dataBaseContext;
             this.productsDbRepository = productsDbRepository;
         }
-        public Cart TryGetByUserId(Guid userId)
+        public async Task<Cart> TryGetByUserIdAsync(Guid userId)
         {
-            return dataBaseContext.Carts
+            return await dataBaseContext.Carts
                                             .Include(x => x.CartItems)
                                             .ThenInclude(x => x.Product)
-                                             .FirstOrDefault(x => x.UserId == userId);
+                                             .FirstOrDefaultAsync(x => x.UserId == userId);
         }
 
-        public Cart CreateNewRepository(Guid userId)
+        public async Task<Cart> CreateNewRepositoryAsync(Guid userId)
         {
             dataBaseContext.Carts.Add(new Cart(userId));
-            dataBaseContext.SaveChanges();
-            return TryGetByUserId(userId);
+            await dataBaseContext.SaveChangesAsync();
+            return await TryGetByUserIdAsync(userId);
         }
 
-        public void AddItem(Guid productId, Guid userId)
+        public async Task AddItemAsync(Guid productId, Guid userId)
         {
-            
+
             if (dataBaseContext.Products.Any(x => x.Id == productId))
             {
-                var cart = TryGetByUserId(userId);
+                var cart = await TryGetByUserIdAsync(userId);
                 if (cart.CartItems.Any(x => x.Product.Id == productId))
                 {
                     var foundItem = cart.CartItems.Single(purchase => purchase.Product.Id == productId);
@@ -47,21 +47,23 @@ namespace OnlineShop.db
                 }
                 else
                 {
-                    var itemToAdd = new CartItem(productsDbRepository.TryGetProductById(productId));
+                    var itemToAdd = new CartItem(await productsDbRepository.TryGetProductByIdAsync(productId));
                     cart = dataBaseContext.Carts.FirstOrDefault(x => x.UserId == userId);
                     if (cart == null)
                     {
-                        CreateNewRepository(userId);
+                        await CreateNewRepositoryAsync(userId);
                     }
                     cart.CartItems.Add(itemToAdd);
                 }
-                dataBaseContext.SaveChanges();
+                await dataBaseContext.SaveChangesAsync();
             }
         }
-        public void ReduceItemCount(Guid productId, Guid userId)
+        public async Task ReduceItemCountAsync(Guid productId, Guid userId)
         {
-            var existingOrder = TryGetByUserId(userId).CartItems;
-            var cartItem = existingOrder.SingleOrDefault(x => x.Product.Id == productId);
+            var user = await TryGetByUserIdAsync(userId);
+            var existingOrder = user?.CartItems;
+            if (existingOrder == null) return;
+            var cartItem = existingOrder?.SingleOrDefault(x => x.Product.Id == productId);
             if (cartItem.Quantity > 1)
             {
                 cartItem.Quantity--;
@@ -69,36 +71,35 @@ namespace OnlineShop.db
             else
             {
                 existingOrder.Remove(cartItem);
-                if (existingOrder.Count() == 0)
+                if (!existingOrder.Any())
                 {
-                    DeleteCart(userId);
+                    await DeleteCartAsync(userId);
                 }
             }
-            dataBaseContext.SaveChanges();
+            await dataBaseContext.SaveChangesAsync();
         }
 
-        public List<CartItem> TryGetAllItems(Guid userId)
+        public async Task<List<CartItem>> TryGetAllItemsAsync(Guid userId)
         {
-            return TryGetByUserId(userId)?.CartItems.ToList() ?? new List<CartItem>();
+            var user = await TryGetByUserIdAsync(userId);
+            return user?.CartItems.ToList() ?? new List<CartItem>();
         }
 
-        public decimal GetTotalPrice(Guid userId)
+        public async Task<decimal> GetTotalPriceAsync(Guid userId)
         {
-            decimal totalPrice = 0;
-            return totalPrice = TryGetByUserId(userId)?.CartItems.Sum(x => x.Quantity * x.Product.Cost) ?? 0;
+            var user = await TryGetByUserIdAsync(userId);
+            return user?.CartItems.Sum(x => x.Quantity * x.Product.Cost) ?? 0;
         }
-        public void DeleteCart(Guid userId)
+        public async Task DeleteCartAsync(Guid userId)
         {
-            var cart = TryGetByUserId(userId);
-            
+            var cart = await TryGetByUserIdAsync(userId);
+
             if (cart == null)
             {
                 return;
             }
             dataBaseContext.Carts.Remove(cart);
-            dataBaseContext.SaveChanges();
-
+            await dataBaseContext.SaveChangesAsync();
         }
-
     }
 }

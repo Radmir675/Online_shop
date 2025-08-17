@@ -1,17 +1,18 @@
 ﻿using OnlineShop.db.Models;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace OnlineShop.db
+namespace OnlineShop.db.Interfaces
 {
     public interface ICartsRepository
     {
-        Cart TryGetByUserId(Guid userId);
-        Cart CreateNewRepository(Guid userId);
-        void DeleteCart(Guid userId);
-        List<CartItem> TryGetAllItems(Guid userId);
-        void AddItem(Guid productId, Guid userId);
-        decimal GetTotalPrice(Guid userId);
-        void ReduceItemCount(Guid productId, Guid userId);
+        Task<Cart> TryGetByUserIdAsync(Guid userId);
+        Task<Cart> CreateNewRepositoryAsync(Guid userId);
+        Task DeleteCartAsync(Guid userId);
+        Task<List<CartItem>> TryGetAllItemsAsync(Guid userId);
+        Task AddItemAsync(Guid productId, Guid userId);
+        Task<decimal> GetTotalPriceAsync(Guid userId);
+        Task ReduceItemCountAsync(Guid productId, Guid userId);
     }
 }

@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OnlineShop.db;
+using OnlineShop.db.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 
-namespace OnlineShopWebApp.db
+namespace OnlineShop.db.Repositories
 {
     public class ProductsDbRepository : IProductsRepository
     {
@@ -14,37 +14,41 @@ namespace OnlineShopWebApp.db
         {
             this.dataBaseContext = dataBaseContext;
         }
-        public List<Product> GetAll()
+        public async Task<List<Product>> GetAllAsync()
         {
-            var products = dataBaseContext?.Products.Include(x => x.Images).ToList();
+            var products = await dataBaseContext?.Products
+                .Include(x => x.Images)
+                .ToListAsync();
             return products;
         }
 
-        public Product TryGetProductById(Guid id)
+        public async Task<Product> TryGetProductByIdAsync(Guid id)
         {
-            return dataBaseContext.Products.Include(x => x.Images).FirstOrDefault(product => product.Id == id);
+            return await dataBaseContext.Products
+                .Include(x => x.Images)
+                .FirstOrDefaultAsync(product => product.Id == id);
         }
-        public void Add(Product product)
+        public async Task AddAsync(Product product)
         {
             dataBaseContext.Products.Add(product);
-            dataBaseContext.SaveChanges();
+            await dataBaseContext.SaveChangesAsync();
         }
-        public void Edit(Product product, Guid id)
+        public async Task EditAsync(Product product, Guid id)
         {
-            var currentProduct = TryGetProductById(id);
+            var currentProduct = await TryGetProductByIdAsync(id);
             currentProduct.Name = product.Name;
             currentProduct.Cost = product.Cost;
             currentProduct.ShortDescription = product.ShortDescription;
             currentProduct.Images = product.Images;
-            dataBaseContext.SaveChanges();
+            await dataBaseContext.SaveChangesAsync();
         }
-        public void Delete(Guid id)
+        public async Task DeleteAsync(Guid id)
         {
-            var productToDelete = TryGetProductById(id);
+            var productToDelete = await TryGetProductByIdAsync(id);
             if (productToDelete != null)
             {
                 dataBaseContext.Remove(productToDelete);
-                dataBaseContext.SaveChanges();
+                await dataBaseContext.SaveChangesAsync();
             }
         }
     }

@@ -23,12 +23,12 @@
                         </tr>
                     </table>
                     <div class="btn-group">
-                        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Edit</button>
+                        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">EditAsync</button>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" asp-area="Admin" asp-controller="Users" asp-action="ChangePassword">Change password</a></li>
-                            <li><a class="dropdown-item" asp-area="Admin" asp-controller="Users" asp-action="EditUserData">Edit data</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-controller="Users" asp-action="EditUserData">EditAsync data</a></li>
                             <li><a class="dropdown-item" asp-area="Admin" asp-controller="Users" asp-action="">Access rights</a></li>
-                            <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#deleteUserModal">Delete</a></li>
+                            <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#deleteUserModal">DeleteAsync</a></li>
                         </ul>
                     </div>
                 </form>
@@ -52,7 +52,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="submit" class="btn btn-primary"
-                            asp-area="Admin" asp-controller="Users" asp-action="Delete" asp-route-userId="@Model.Id">Delete</button>
+                            asp-area="Admin" asp-controller="Users" asp-action="Delete" asp-route-userId="@Model.Id">DeleteAsync</button>
                 </div>
             </div>
         </form>
