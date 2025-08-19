@@ -11,6 +11,7 @@ using OnlineShop.db.Interfaces;
 using OnlineShop.db.Models;
 using OnlineShop.db.Repositories;
 using OnlineShopWebApp.Helpers;
+using OnlineShopWebApp.MiddleWare;
 using Serilog;
 using System;
 
@@ -79,10 +80,8 @@ namespace OnlineShopWebApp
             );
 
             app.UseRouting();
-
+            app.UseMiddleware<TaskCancellationTokenMiddleware>();
             app.UseAuthentication();
-            app.UseAuthorization();
-
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

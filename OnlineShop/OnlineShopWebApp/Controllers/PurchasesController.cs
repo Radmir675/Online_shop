@@ -5,6 +5,7 @@ using OnlineShop.db.Interfaces;
 using OnlineShopWebApp.Models;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OnlineShopWebApp.Controllers
@@ -23,52 +24,52 @@ namespace OnlineShopWebApp.Controllers
             this.mapper = mapper;
         }
 
-        public async Task<IActionResult> Index(Guid? productId)
+        public async Task<IActionResult> Index(Guid? productId, CancellationToken cancellationToken = default)
         {
             if (productId.HasValue)
             {
-                var cart = await cartsDbRepository.TryGetByUserIdAsync(UserId);
+                var cart = await cartsDbRepository.TryGetByUserIdAsync(UserId, cancellationToken);
                 if (cart == null)
                 {
-                    await cartsDbRepository.CreateNewRepositoryAsync(UserId);
+                    await cartsDbRepository.CreateNewRepositoryAsync(UserId, cancellationToken);
                 }
-                await cartsDbRepository.AddItemAsync(productId.Value, UserId);
+                await cartsDbRepository.AddItemAsync(productId.Value, UserId, cancellationToken);
 
                 return RedirectToAction("ShowItems");
             }
             return View();
         }
-        public async Task<IActionResult> ShowItemsAsync()
+        public async Task<IActionResult> ShowItemsAsync(CancellationToken cancellationToken)
         {
-            var currentCartItems = await cartsDbRepository?.TryGetAllItemsAsync(UserId);
+            var currentCartItems = await cartsDbRepository?.TryGetAllItemsAsync(UserId, cancellationToken);
             var itemsInCart = currentCartItems?.Select(x => mapper.Map<CartItemViewModel>(x)).ToList();
-            ViewBag.totalCost = (await cartsDbRepository.GetTotalPriceAsync(UserId)).ToString("0.##");
-            var cart = await cartsDbRepository.TryGetByUserIdAsync(UserId);
+            ViewBag.totalCost = (await cartsDbRepository.GetTotalPriceAsync(UserId, cancellationToken)).ToString("0.##");
+            var cart = await cartsDbRepository.TryGetByUserIdAsync(UserId, cancellationToken);
             return cart == null ? View("EmptyBag") : View("Index", itemsInCart);
         }
 
-        public async Task<IActionResult> IncrementCountAsync(Guid productId)
+        public async Task<IActionResult> IncrementCountAsync(Guid productId, CancellationToken cancellationToken)
         {
-            if ((await cartsDbRepository.TryGetAllItemsAsync(UserId)).Any(x => x.Product.Id == productId))
+            if ((await cartsDbRepository.TryGetAllItemsAsync(UserId, cancellationToken)).Any(x => x.Product.Id == productId))
             {
-                await cartsDbRepository.AddItemAsync(productId, UserId);
+                await cartsDbRepository.AddItemAsync(productId, UserId, cancellationToken);
             }
             return RedirectToAction("ShowItems");
 
         }
 
-        public async Task<IActionResult> DecrementCountAsync(Guid productId)
+        public async Task<IActionResult> DecrementCountAsync(Guid productId, CancellationToken cancellationToken)
         {
-            if ((await cartsDbRepository.TryGetAllItemsAsync(UserId)).Any(x => x.Product.Id == productId))
+            if ((await cartsDbRepository.TryGetAllItemsAsync(UserId, cancellationToken)).Any(x => x.Product.Id == productId))
             {
-                await cartsDbRepository.ReduceItemCountAsync(productId, UserId);
+                await cartsDbRepository.ReduceItemCountAsync(productId, UserId, cancellationToken);
             }
             return RedirectToAction("ShowItems");
         }
 
-        public async Task<IActionResult> ClearCartAsync()
+        public async Task<IActionResult> ClearCartAsync(CancellationToken cancellationToken)
         {
-            await cartsDbRepository.DeleteCartAsync(UserId);
+            await cartsDbRepository.DeleteCartAsync(UserId, cancellationToken);
             return RedirectToAction("ShowItems");
         }
     }
